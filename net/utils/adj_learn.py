@@ -7,9 +7,11 @@ from torch.autograd import Variable
 
 
 def my_softmax(input, axis=1):
-	trans_input = input.transpose(axis, 0).contiguous()
-	soft_max_1d = F.softmax(trans_input)
-	return soft_max_1d.transpose(axis, 0)
+	# import ipdb; ipdb.set_trace()
+	# trans_input = input.transpose(axis, 0).contiguous()
+	# soft_max_1d = F.softmax(trans_input)
+	# return soft_max_1d.transpose(axis, 0)
+	return F.softmax(input, dim=axis)
 
 
 def get_offdiag_indices(num_nodes):
