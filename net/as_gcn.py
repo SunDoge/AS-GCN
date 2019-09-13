@@ -281,8 +281,8 @@ class SpatialGcn(nn.Module):
         x1, x2 = x.split(self.k_num - self.edge_type, dim=1)
 
         # [n 0,k 1,c 2,t 3,v 4] -> [n,c,t,k,v] -> [n,c,t,kv]
-        x1 = x1.permute(0, 2, 3, 1, 4).view(n, ct, -1)
-        x2 = x2.permute(0, 2, 3, 1, 4).view(n, ct, -1)
+        x1 = x1.permute(0, 2, 3, 1, 4).reshape(n, ct, -1)
+        x2 = x2.permute(0, 2, 3, 1, 4).reshape(n, ct, -1)
 
         A = A.view(-1, v)
         B = B.view(n, -1, v)
@@ -323,7 +323,7 @@ class SpatialGcnRecon(nn.Module):
 
         x = self.deconv(x)
         n, kc, t, v = x.size()
-        import ipdb; ipdb.set_trace()
+        # import ipdb; ipdb.set_trace()
         
         # x = x.view(n, self.k_num,  kc//self.k_num, t, v)
         # x1 = x[:,:self.k_num-self.edge_type,:,:,:]
@@ -340,8 +340,8 @@ class SpatialGcnRecon(nn.Module):
         x1, x2 = x.split(self.k_num - self.edge_type, dim=1)
 
         # [n 0,k 1,c 2,t 3,v 4] -> [n,c,t,k,v] -> [n,c,t,kv]
-        x1 = x1.permute(0, 2, 3, 1, 4).view(n, ct, -1)
-        x2 = x2.permute(0, 2, 3, 1, 4).view(n, ct, -1)
+        x1 = x1.permute(0, 2, 3, 1, 4).reshape(n, ct, -1)
+        x2 = x2.permute(0, 2, 3, 1, 4).reshape(n, ct, -1)
 
         A = A.view(-1, v)
         B = B.view(n, -1, v)
