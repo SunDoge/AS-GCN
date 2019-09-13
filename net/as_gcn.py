@@ -263,14 +263,39 @@ class SpatialGcn(nn.Module):
                               bias=bias)
 
     def forward(self, x, A, B, lamda_act):
-
+        # import ipdb; ipdb.set_trace()
         x = self.conv(x)
         n, kc, t, v = x.size()
-        x = x.view(n, self.k_num,  kc//self.k_num, t, v)
-        x1 = x[:,:self.k_num-self.edge_type,:,:,:]
-        x2 = x[:,-self.edge_type:,:,:,:]
-        x1 = torch.einsum('nkctv,kvw->nctw', (x1, A))
-        x2 = torch.einsum('nkctv,nkvw->nctw', (x2, B))
+
+        # x = x.view(n, self.k_num,  kc//self.k_num, t, v)
+        # x1 = x[:,:self.k_num-self.edge_type,:,:,:]
+        # x2 = x[:,-self.edge_type:,:,:,:]
+        # x1 = torch.einsum('nkctv,kvw->nctw', (x1, A))
+        # x2 = torch.einsum('nkctv,nkvw->nctw', (x2, B))
+
+        # Modify {
+        c = kc // self.k_num
+        
+        ct = c * t
+        x = x.view(n, self.k_num, c, t, v)
+        x1, x2 = x.split(self.k_num - self.edge_type, dim=1)
+
+        # [n 0,k 1,c 2,t 3,v 4] -> [n,c,t,k,v] -> [n,c,t,kv]
+        x1 = x1.permute(0, 2, 3, 1, 4).view(n, ct, -1)
+        x2 = x2.permute(0, 2, 3, 1, 4).view(n, ct, -1)
+
+        A = A.view(-1, v)
+        B = B.view(n, -1, v)
+
+        x1 = x1 @ A
+        x2 = x2 @ B
+
+        x1 = x1.view(n, c, t, v)
+        x2 = x2.view(n, c, t, v)
+
+        # } Modify 
+
+
         x_sum = x1+x2*lamda_act
 
         return x_sum.contiguous(), A
@@ -298,6 +323,7 @@ class SpatialGcnRecon(nn.Module):
 
         x = self.deconv(x)
         n, kc, t, v = x.size()
+        import ipdb; ipdb.set_trace()
         
         # x = x.view(n, self.k_num,  kc//self.k_num, t, v)
         # x1 = x[:,:self.k_num-self.edge_type,:,:,:]
