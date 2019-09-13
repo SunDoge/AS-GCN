@@ -7,6 +7,10 @@ from torch.autograd import Variable
 
 
 def my_softmax(input, axis=1):
+    """
+    改为使用softmax的dim来实现，可能与原code的目标不符。
+    """
+
     # import ipdb; ipdb.set_trace()
     # trans_input = input.transpose(axis, 0).contiguous()
     # soft_max_1d = F.softmax(trans_input)
