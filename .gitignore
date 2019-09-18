@@ -3,3 +3,4 @@ __pycache__/
 *.npy
 *.pkl
 work_dir/
+*.lprof
